@@ -67,4 +67,27 @@ export class PostsService {
         this.postsUpdated.next([...this.posts]);
       })
   }
+
+  updatePost(id: string, title: string, content: string) {
+    const post: Post = { id: id, title: title, content: content };
+    this.http.put("http://localhost:9086/api/posts/" + id, post)
+      .subscribe((response) => {
+        console.log(response);
+        // below code is redundant
+        // because on home page, we get the whole list from the backend
+        const updatePosts = [...this.posts];
+        const oldPostIndex = updatePosts.findIndex(p => p.id === post.id);
+        updatePosts[oldPostIndex] = post;
+        this.posts = updatePosts;
+        this.postsUpdated.next([...this.posts]);
+      });
+  }
+
+  // getPost(id: string) {
+  //   return { ...this.posts.find(p => p.id === id) };
+  // }
+
+  getPost(id: string) {
+    return this.http.get<{ _id: string, title: string, content: string }>("http://localhost:9086/api/posts/" + id);
+  }
 }

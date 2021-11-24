@@ -1,5 +1,6 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
 
@@ -11,6 +12,9 @@ import { PostsService } from '../posts.service';
 export class PostCreateComponent implements OnInit {
   enteredContent = '';
   enteredTitle = '';
+  private mode = 'create';
+  private postId: string;
+  post: Post;
   // @Output() postCreated = new EventEmitter<Post>();
 
   // onAddPost() {
@@ -18,7 +22,7 @@ export class PostCreateComponent implements OnInit {
   //   this.postCreated.emit(post);
   // }
 
-  onAddPost(form: NgForm) {
+  onSavePost(form: NgForm) {
 
     if (form.invalid) {
       return;
@@ -26,15 +30,33 @@ export class PostCreateComponent implements OnInit {
 
     const post: Post = { id: null, title: form.value.title, content: form.value.content };
     // this.postCreated.emit(post);
-    this.postsService.addPost(post.title, post.content);
+
+    if (this.mode === 'create') {
+      this.postsService.addPost(post.title, post.content);
+    } else {
+      this.postsService.updatePost(this.postId, form.value.title, form.value.content);
+    }
     form.resetForm();
   }
 
-  constructor(public postsService: PostsService) {
-
+  // ActivatedRoute gives the information about the route
+  // and how user reached this component
+  constructor(public postsService: PostsService, public route: ActivatedRoute) {
   }
 
   ngOnInit() {
-
+    this.route.paramMap.subscribe((paramMap: ParamMap) => {
+      if (paramMap.has('postId')) {
+        this.mode = 'edit';
+        this.postId = paramMap.get('postId');
+        //this.post = this.postsService.getPost(this.postId);
+        this.postsService.getPost(this.postId).subscribe(postData => {
+          this.post = { id: postData._id, title: postData.title, content: postData.content };
+        });
+      } else {
+        this.mode = 'create';
+        this.postId = null;
+      }
+    });
   }
 }
