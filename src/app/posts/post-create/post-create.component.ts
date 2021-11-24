@@ -15,6 +15,7 @@ export class PostCreateComponent implements OnInit {
   private mode = 'create';
   private postId: string;
   post: Post;
+  isLoading = false;
   // @Output() postCreated = new EventEmitter<Post>();
 
   // onAddPost() {
@@ -27,7 +28,8 @@ export class PostCreateComponent implements OnInit {
     if (form.invalid) {
       return;
     }
-
+    //dont need to set to false because we are navigating away from this page after adding/updating the post
+    this.isLoading = true;
     const post: Post = { id: null, title: form.value.title, content: form.value.content };
     // this.postCreated.emit(post);
 
@@ -50,7 +52,11 @@ export class PostCreateComponent implements OnInit {
         this.mode = 'edit';
         this.postId = paramMap.get('postId');
         //this.post = this.postsService.getPost(this.postId);
+        //show spinner
+        this.isLoading = true;
         this.postsService.getPost(this.postId).subscribe(postData => {
+          //hide spinner
+          this.isLoading = false;
           this.post = { id: postData._id, title: postData.title, content: postData.content };
         });
       } else {

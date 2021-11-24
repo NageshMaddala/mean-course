@@ -6,3 +6,7 @@
 .info-text-nagesh {
   text-align: center;
 }
+
+mat-spinner {
+  margin: auto;
+}
