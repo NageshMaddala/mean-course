@@ -1,7 +1,34 @@
 //express router
 const express = require("express");
+const multer = require("multer");
+
 const Post = require('../models/post');
 const router = express.Router();
+
+const MIME_TYPE_MAP = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg'
+};
+
+//configure multer on how to deal with the file
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const isValid = MIME_TYPE_MAP[file.mimetype];
+    let error = new Error('Invalid mime type');
+    if (isValid) {
+      error = null;
+    }
+    //where to store file
+    cb(error, "backend/images");
+  },
+  filename: (req, file, cb) => {
+    const name = file.originalname.toLowerCase().split(' ').join('-');
+    const ext = MIME_TYPE_MAP[file.mimetype];
+    cb(null, name + '-' + Date.now() + '.' + ext);
+  }
+});
+
 
 //add middleware
 // app.use((req, res, next) => {
@@ -18,21 +45,32 @@ const router = express.Router();
 //this will invoked for post requests
 //like-wise app.put() for update requests,
 //app.delete() and so on..
-router.post("", (req, res, next) => {
+//multer package is used to extract the file content
+router.post("", multer({ storage: storage }).single("image"), (req, res, next) => {
   // const post = req.body;
   // console.log(post);
+  // protocol gives us http or https
+  const url = req.protocol + '://' + req.get("host");
 
   const post = new Post({
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + "/images/" + req.file.filename
   });
 
   console.log(post);
-  post.save().then(result => {
+  post.save().then(createdPost => {
     console.log("successfully added new record at the database");
     res.status(201).json({
       message: 'Post added successfully',
-      postId: result._id
+      //postId: result._id
+      post: {
+        ...createdPost,
+        id: createdPost._id,
+        // title: createdPost.title,
+        // content: createdPost.content,
+        // imagePath: createdPost.imagePath
+      }
     });
   });
 
@@ -101,17 +139,20 @@ router.delete("/:id", (req, res, next) => {
   })
 });
 
-router.put("/:id", (req, res, next) => {
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.connect
-  })
-  Post.updateOne({ _id: req.params.id }, post).then(result => {
-    console.log(result);
-    res.status(200).json({ message: 'Update successful!' });
+router.put("/:id", multer({ storage: storage }).single("image"),
+  (req, res, next) => {
+
+    //not worried about the edit logic for now..
+    const post = new Post({
+      _id: req.body.id,
+      title: req.body.title,
+      content: req.body.content
+    })
+    Post.updateOne({ _id: req.params.id }, post).then(result => {
+      console.log(result);
+      res.status(200).json({ message: 'Update successful!' });
+    });
   });
-});
 
 router.get("/:id", (req, res, next) => {
   Post.findById(req.params.id).then(post => {

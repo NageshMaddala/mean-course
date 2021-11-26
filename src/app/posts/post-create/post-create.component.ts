@@ -1,8 +1,9 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
+import { mimeType } from './mime-type.validator';
 
 @Component({
   selector: 'app-post-create',
@@ -16,6 +17,12 @@ export class PostCreateComponent implements OnInit {
   private postId: string;
   post: Post;
   isLoading = false;
+  imagePreview: string;
+
+  //groups all controls
+  //also, we can have subgroups under form group
+  form: FormGroup;
+
   // @Output() postCreated = new EventEmitter<Post>();
 
   // onAddPost() {
@@ -23,22 +30,47 @@ export class PostCreateComponent implements OnInit {
   //   this.postCreated.emit(post);
   // }
 
-  onSavePost(form: NgForm) {
+  onImagePicked(event: Event) {
+    const file = (event.target as HTMLInputElement).files[0];
+    //allows us to target a single control
+    this.form.patchValue({ image: file });
+    //reevaluate the form here
+    this.form.get('image').updateValueAndValidity();
+    console.log(file);
+    console.log(this.form);
+    //to display image on ui
+    //convert image to imagedataurl
+    //use filereader for that
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result.toString();
+    };
+    reader.readAsDataURL(file);
+  }
 
-    if (form.invalid) {
+  onSavePost() {
+
+    if (this.form.invalid) {
       return;
     }
     //dont need to set to false because we are navigating away from this page after adding/updating the post
     this.isLoading = true;
-    const post: Post = { id: null, title: form.value.title, content: form.value.content };
+    const post: Post = {
+      id: null,
+      title: this.form.value.title,
+      content: this.form.value.content,
+      imagePath: null
+    };
     // this.postCreated.emit(post);
 
     if (this.mode === 'create') {
-      this.postsService.addPost(post.title, post.content);
+      //this.postsService.addPost(post.title, post.content);
+      this.postsService.addPost(this.form.value.title, this.form.value.content, this.form.value.image);
     } else {
-      this.postsService.updatePost(this.postId, form.value.title, form.value.content);
+      this.postsService.updatePost(this.postId, this.form.value.title,
+        this.form.value.content, this.form.value.image);
     }
-    form.resetForm();
+    this.form.reset();
   }
 
   // ActivatedRoute gives the information about the route
@@ -47,6 +79,20 @@ export class PostCreateComponent implements OnInit {
   }
 
   ngOnInit() {
+    //add controls to the form here
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        validators: [Validators.required, Validators.minLength(3)]
+      }),
+      content: new FormControl(null, {
+        validators: [Validators.required]
+      }),
+      image: new FormControl(null, {
+        validators: [Validators.required],
+        asyncValidators: [mimeType]
+      })
+    });
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
@@ -57,7 +103,17 @@ export class PostCreateComponent implements OnInit {
         this.postsService.getPost(this.postId).subscribe(postData => {
           //hide spinner
           this.isLoading = false;
-          this.post = { id: postData._id, title: postData.title, content: postData.content };
+          this.post = {
+            id: postData._id,
+            title: postData.title,
+            content: postData.content,
+            imagePath: postData.imagePath
+          };
+          this.form.setValue({
+            title: this.post.title,
+            content: this.post.content,
+            image: this.post.imagePath
+          });
         });
       } else {
         this.mode = 'create';
