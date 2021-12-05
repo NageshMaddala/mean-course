@@ -10,7 +10,8 @@ mongoose.connect("mongodb+srv://mean-sample:tgzo5cum7NS8hh48@cluster0.rfnda.mong
   .then(() => {
     console.log('Connected to database!');
   })
-  .catch(() => {
+  .catch((e) => {
+    console.log(e);
     console.log('Connection failed!');
   });
 
