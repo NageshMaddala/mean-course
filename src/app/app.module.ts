@@ -1,7 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatInputModule, MatCardModule, MatButtonModule, MatToolbarModule, MatExpansionModule, MatProgressSpinnerModule } from '@angular/material';
+import { MatInputModule, MatCardModule, MatButtonModule,
+         MatToolbarModule, MatExpansionModule, MatProgressSpinnerModule,
+         MatPaginatorModule} from '@angular/material';
 // import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
@@ -31,6 +33,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatToolbarModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
+    MatPaginatorModule,
     HttpClientModule
   ],
   providers: [],
