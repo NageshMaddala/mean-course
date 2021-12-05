@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const postsRoutes = require("./routes/posts");
 //lets us access path or directory on server or os
+const userRoutes = require("./routes/user");
+
 const path = require("path");
 
 mongoose.connect("mongodb+srv://mean-sample:tgzo5cum7NS8hh48@cluster0.rfnda.mongodb.net/node-angular?retryWrites=true&w=majority")
@@ -47,5 +49,6 @@ app.use((req, res, next) => {
 
 //this will do the trick of routing to the requests to router
 app.use("/api/posts", postsRoutes);
+app.use("/api/user", userRoutes);
 
 module.exports = app;
