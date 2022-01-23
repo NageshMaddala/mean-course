@@ -3,6 +3,8 @@ const express = require("express");
 const multer = require("multer");
 
 const Post = require('../models/post');
+const checkAuth = require('../middleware/check-auth');
+
 const router = express.Router();
 
 const MIME_TYPE_MAP = {
@@ -46,7 +48,8 @@ const storage = multer.diskStorage({
 //like-wise app.put() for update requests,
 //app.delete() and so on..
 //multer package is used to extract the file content
-router.post("", multer({ storage: storage }).single("image"), (req, res, next) => {
+//this route must be protected
+router.post("", checkAuth, multer({ storage: storage }).single("image"), (req, res, next) => {
   // const post = req.body;
   // console.log(post);
   // protocol gives us http or https
@@ -129,7 +132,8 @@ router.get('', (req, res, next) => {
 
 //:id dynamic path segment
 // id is passed from the server
-router.delete("/:id", (req, res, next) => {
+// this route must be protected
+router.delete("/:id", checkAuth, (req, res, next) => {
   console.log(req.params.id);
   Post.deleteOne({
     _id: req.params.id
@@ -139,7 +143,8 @@ router.delete("/:id", (req, res, next) => {
   })
 });
 
-router.put("/:id", multer({ storage: storage }).single("image"),
+//this route must be protected
+router.put("/:id", checkAuth, multer({ storage: storage }).single("image"),
   (req, res, next) => {
 
     //not worried about the edit logic for now..
