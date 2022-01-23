@@ -3,7 +3,11 @@
 // steps:
 // 1. Token is valid/token is attached
 // 2. Validate the Token - use jwt to validate the token
-// 3.
+// 3. just add this middleware in all the route
+// 4. All the client requests should pass this token
+//    There are 2 possible ways
+//      1. manually add header to the all requests which requires guarding
+//      2. Or create http interceptor to accomplish the same requirement
 
 const jwt = require("jsonwebtoken");
 
