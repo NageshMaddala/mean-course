@@ -18,7 +18,15 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     // write code to validate the token
     // if below verify doesn't throw error then its valid
-    jwt.verify(token, "secret_this_should_be_longer");
+    const decodedToken = jwt.verify(token, "secret_this_should_be_longer");
+    // req will be passed to the next middleware
+    // so add decodedToken to this req object and pass it to next middleware
+    // Token already contails user id and email
+    // so decodedToken contains this infomration, so just pass it via req object
+    // create new dynamic property on req object and add this information, just make sure don't override
+    // the existing property
+    //console.log(decodedToken);
+    req.userData = { email: decodedToken.email, userId: decodedToken.userId };
     next();
   } catch (error) {
     res.status(401).json({ message: "Auth failed!" });

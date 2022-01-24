@@ -30,11 +30,13 @@ export class PostsService {
             title: post.title,
             content: post.content,
             id: post._id,
-            imagePath: post.imagePath
+            imagePath: post.imagePath,
+            creator: post.creator
           };
         });
       }))
       .subscribe((transformedPosts) => {
+        console.log(transformedPosts);
         this.posts = transformedPosts;
         this.postsUpdated.next([...this.posts]);
       });
@@ -58,7 +60,8 @@ export class PostsService {
           id: responseData.post.id,
           title: title,
           content: content,
-          imagePath: responseData.post.imagePath
+          imagePath: responseData.post.imagePath,
+          creator: null
         };
         console.log(responseData.message);
         //update the locally cache only after
@@ -101,7 +104,8 @@ export class PostsService {
         id: id,
         title: title,
         content: content,
-        imagePath: image
+        imagePath: image,
+        creator: null
       };
     }
     // const post: Post = { id: id, title: title, content: content, imagePath: null };
@@ -116,7 +120,8 @@ export class PostsService {
           id: id,
           title: title,
           content: content,
-          imagePath: ""
+          imagePath: "",
+          creator: null
         };
         updatePosts[oldPostIndex] = post;
         this.posts = updatePosts;
@@ -130,7 +135,7 @@ export class PostsService {
   // }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>
+    return this.http.get<{ _id: string, title: string, content: string, imagePath: string, creator: string }>
       ("http://localhost:9086/api/posts/" + id);
   }
 }

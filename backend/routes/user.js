@@ -58,12 +58,13 @@ router.post("/login", (req, res, next) => {
     //create json webtoken
     //jwt.io read more about that
     //below line creates token
-    const token = jwt.sign({ email: fetchedUser.email, userId: fetchedUser._Id }, 'secret_this_should_be_longer',
+    const token = jwt.sign({ email: fetchedUser.email, userId: fetchedUser._id }, 'secret_this_should_be_longer',
       { expiresIn: "1h" });
     res.status(200).json({
       token: token,
       // 3600 seconds
-      expiresIn: 3600
+      expiresIn: 3600,
+      userId: fetchedUser._id
     });
 
   }).catch(err => {
