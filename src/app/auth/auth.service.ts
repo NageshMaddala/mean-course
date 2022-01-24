@@ -39,8 +39,12 @@ export class AuthService {
 
     this.http.post("http://localhost:9086/api/user/signup", authData)
       .subscribe(response => {
-        console.log(response);
-      })
+        //console.log(response);
+        this.router.navigate["/"];
+      }, error => {
+        //console.log(error)
+        this.authStatusListener.next(false);
+      });
   }
 
   login(email: string, password: string) {
@@ -70,7 +74,9 @@ export class AuthService {
           // redirect to home page upon successful login
           this.router.navigate(['/']);
         }
-      })
+      }, error => {
+        this.authStatusListener.next(false);
+      });
   }
 
   getUserId() {
