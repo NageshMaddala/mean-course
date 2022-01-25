@@ -58,10 +58,14 @@ router.post("", checkAuth, multer({ storage: storage }).single("image"), (req, r
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + "/images/" + req.file.filename
+    imagePath: url + "/images/" + req.file.filename,
+    creator: req.userData.userId
   });
 
-  console.log(post);
+  // console.log(req.userData);
+  //spot test from returning value from here
+  // return res.status(200).json({});
+  // console.log(post);
   post.save().then(createdPost => {
     console.log("successfully added new record at the database");
     res.status(201).json({
@@ -75,7 +79,12 @@ router.post("", checkAuth, multer({ storage: storage }).single("image"), (req, r
         // imagePath: createdPost.imagePath
       }
     });
-  });
+  })
+    .catch(error => {
+      res.status(500).json({
+        message: "Creating a post failed"
+      })
+    });
 
   //still need to return 201 saying everything is good
   // res.status(201).json({
@@ -120,6 +129,11 @@ router.get('', (req, res, next) => {
         posts: documents
       });
     })
+    .catch(error => {
+      res.status(500).json({
+        message: "Fetching posts failed!"
+      });
+    });
 
   //to send response in json format
   //set the optional status and don't call next unless you want to pass
@@ -136,10 +150,15 @@ router.get('', (req, res, next) => {
 router.delete("/:id", checkAuth, (req, res, next) => {
   console.log(req.params.id);
   Post.deleteOne({
-    _id: req.params.id
+    _id: req.params.id,
+    creator: req.userData.userId
   }).then(result => {
     console.log(result);
-    res.status(200).json({ message: "Post deleted" });
+    if (result.deletedCount > 0) {
+      res.status(200).json({ message: 'Deletion successful!' });
+    } else {
+      res.status(401).json({ message: 'Not Authorized!' });
+    }
   })
 });
 
@@ -151,12 +170,22 @@ router.put("/:id", checkAuth, multer({ storage: storage }).single("image"),
     const post = new Post({
       _id: req.body.id,
       title: req.body.title,
-      content: req.body.content
+      content: req.body.content,
+      creator: req.userData.userId
     })
-    Post.updateOne({ _id: req.params.id }, post).then(result => {
-      console.log(result);
-      res.status(200).json({ message: 'Update successful!' });
-    });
+    Post.updateOne({ _id: req.params.id, creator: req.userData.userId }, post).then(result => {
+      //console.log(result);
+      if (result.modifiedCount > 0) {
+        res.status(200).json({ message: 'Update successful!' });
+      } else {
+        res.status(401).json({ message: 'Not Authorized!' });
+      }
+    })
+      .catch(error => {
+        res.status(500).json({
+          message: "Couldn't update post!"
+        });
+      });
   });
 
 router.get("/:id", (req, res, next) => {
@@ -166,6 +195,10 @@ router.get("/:id", (req, res, next) => {
     } else {
       res.status(404).json({ message: 'Post not found!' });
     }
+  }).catch(error => {
+    res.status(500).json({
+      message: "Fetching post failed!"
+    });
   });
 });
 

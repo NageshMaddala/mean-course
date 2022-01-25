@@ -22,7 +22,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   pageSizeOptions = [1, 2, 5, 10];
   private authStatusSub: Subscription;
   userIsAuthenticated = false;
-
+  userId:string;
   // posts = [
   //   { title: "First Post", content: "This is the first post's content" },
   //   { title: "Second Post", content: "This is the second post's content" },
@@ -55,6 +55,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     //the subscriber would receive this data and deal with it appropriately
     this.postsService.getPosts();
     this.userIsAuthenticated = this.authService.getIsAuth();
+    this.userId = this.authService.getUserId();
     this.postsSub = this.postsService.getPostsUpdateListener().subscribe(
       (posts: Post[]) => {
         this.posts = posts;
@@ -63,6 +64,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     );
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(isAuthenticated => {
       this.userIsAuthenticated = isAuthenticated;
+      this.userId = this.authService.getUserId();
     });
   }
 }
