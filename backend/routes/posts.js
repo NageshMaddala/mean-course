@@ -1,32 +1,9 @@
 //express router
 const express = require("express");
-const multer = require("multer");
 const PostController = require("../controllers/posts");
 const checkAuth = require('../middleware/check-auth');
+const extractFile = require('../middleware/file');
 const router = express.Router();
-const MIME_TYPE_MAP = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/jpg': 'jpg'
-};
-
-//configure multer on how to deal with the file
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const isValid = MIME_TYPE_MAP[file.mimetype];
-    let error = new Error('Invalid mime type');
-    if (isValid) {
-      error = null;
-    }
-    //where to store file
-    cb(error, "backend/images");
-  },
-  filename: (req, file, cb) => {
-    const name = file.originalname.toLowerCase().split(' ').join('-');
-    const ext = MIME_TYPE_MAP[file.mimetype];
-    cb(null, name + '-' + Date.now() + '.' + ext);
-  }
-});
 
 //add middleware
 // app.use((req, res, next) => {
@@ -47,7 +24,7 @@ const storage = multer.diskStorage({
 //this route must be protected
 router.post("",
   checkAuth,
-  multer({ storage: storage }).single("image"),
+  extractFile,
   PostController.createPost);
 
 // basically it honors only the requests if the path
@@ -65,7 +42,7 @@ router.delete("/:id", checkAuth, PostController.deletePost);
 //this route must be protected
 router.put("/:id",
   checkAuth,
-  multer({ storage: storage }).single("image"),
+  extractFile,
   PostController.updatePost
 );
 
