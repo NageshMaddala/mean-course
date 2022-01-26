@@ -18,7 +18,7 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     // write code to validate the token
     // if below verify doesn't throw error then its valid
-    const decodedToken = jwt.verify(token, "secret_this_should_be_longer");
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
     // req will be passed to the next middleware
     // so add decodedToken to this req object and pass it to next middleware
     // Token already contails user id and email

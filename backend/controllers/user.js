@@ -53,7 +53,13 @@ exports.userLogin = (req, res, next) => {
     //create json webtoken
     //jwt.io read more about that
     //below line creates token
-    const token = jwt.sign({ email: fetchedUser.email, userId: fetchedUser._id }, 'secret_this_should_be_longer',
+    const token = jwt.sign({ email: fetchedUser.email, userId: fetchedUser._id },
+      // 'secret_this_should_be_longer',
+      // nodejs maintains a process which contains
+      // all the information about the environment variables
+      // config that was injected into the app, here it's the whole
+      // config from nodemon.json file
+      process.env.JWT_KEY,
       { expiresIn: "1h" });
     res.status(200).json({
       token: token,

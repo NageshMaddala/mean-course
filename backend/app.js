@@ -8,7 +8,7 @@ const userRoutes = require("./routes/user");
 
 const path = require("path");
 
-mongoose.connect("mongodb+srv://mean-sample:tgzo5cum7NS8hh48@cluster0.rfnda.mongodb.net/node-angular?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://mean-sample:" + process.env.MONGO_ATLAS_PW + "@cluster0.rfnda.mongodb.net/node-angular?retryWrites=true&w=majority")
   .then(() => {
     console.log('Connected to database!');
   })
