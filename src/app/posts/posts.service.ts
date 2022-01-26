@@ -3,8 +3,11 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-
+import { environment } from 'src/environments/environment';
 import { Post } from './post.model';
+
+const BACKEND_URL = environment.apiUrl + "/posts/";
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,7 +26,7 @@ export class PostsService {
     // use httpclient module for http requests
 
     // we can cast to the expected response type
-    this.http.get<{ message: string, posts: any }>('http://localhost:9086/api/posts')
+    this.http.get<{ message: string, posts: any }>(BACKEND_URL)
       .pipe(map((postData) => {
         return postData.posts.map(post => {
           return {
@@ -53,7 +56,7 @@ export class PostsService {
     //title would the file name
     postData.append("image", image, title);
 
-    this.http.post<{ message: string, post: Post }>('http://localhost:9086/api/posts'
+    this.http.post<{ message: string, post: Post }>(BACKEND_URL
       , postData)
       .subscribe((responseData) => {
         const post: Post = {
@@ -81,7 +84,7 @@ export class PostsService {
   }
 
   deletePost(postId: string) {
-    this.http.delete("http://localhost:9086/api/posts/" + postId)
+    this.http.delete(BACKEND_URL + postId)
       .subscribe(() => {
         console.log('Deleted');
         const updatedPosts = this.posts.filter(post => post.id !== postId);
@@ -109,7 +112,7 @@ export class PostsService {
       };
     }
     // const post: Post = { id: id, title: title, content: content, imagePath: null };
-    this.http.put("http://localhost:9086/api/posts/" + id, postData)
+    this.http.put(BACKEND_URL + id, postData)
       .subscribe((response) => {
         console.log(response);
         // below code is redundant
@@ -136,6 +139,6 @@ export class PostsService {
 
   getPost(id: string) {
     return this.http.get<{ _id: string, title: string, content: string, imagePath: string, creator: string }>
-      ("http://localhost:9086/api/posts/" + id);
+      (BACKEND_URL + id);
   }
 }
