@@ -3,12 +3,17 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const postsRoutes = require("./routes/posts");
+//lets us access path or directory on server or os
+const userRoutes = require("./routes/user");
 
-mongoose.connect("mongodb+srv://mean-sample:tgzo5cum7NS8hh48@cluster0.rfnda.mongodb.net/node-angular?retryWrites=true&w=majority")
+const path = require("path");
+
+mongoose.connect("mongodb+srv://mean-sample:" + process.env.MONGO_ATLAS_PW + "@cluster0.rfnda.mongodb.net/node-angular?retryWrites=true&w=majority")
   .then(() => {
     console.log('Connected to database!');
   })
-  .catch(() => {
+  .catch((e) => {
+    console.log(e);
     console.log('Connection failed!');
   });
 
@@ -25,6 +30,10 @@ app.use(bodyParser.json());
 // url encoding, bodyparser is capable of doing that
 // but not required for this excersise
 app.use(bodyParser.urlencoded({ extended: false }));
+// any request accessing images directory will be allowed
+// when marked with express.static()
+// requests coming to images will be forwarded to backend/images
+app.use("/images", express.static(path.join("backend/images")));
 
 //cors middleware,
 //adding headers to fix the cors issue
@@ -32,7 +41,7 @@ app.use((req, res, next) => {
   //allows which domains to access our resources
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept");
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST, PATCH, PUT, DELETE, OPTIONS");
   console.log("CORS have been set");
   next();
@@ -40,5 +49,6 @@ app.use((req, res, next) => {
 
 //this will do the trick of routing to the requests to router
 app.use("/api/posts", postsRoutes);
+app.use("/api/user", userRoutes);
 
 module.exports = app;
