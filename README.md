@@ -1,9 +1,10 @@
 # MeanPOC
 
-Goal was to create a simple full working MEAN stack application - 
+Goal was to create a simple full working MEAN stack application
+
 Here is the tech stack info: 
-  Front End: Angular 8, Typescript, Angular material
-  Back End: Nodejs, Express, MongoDB, Mongoose, JWT for authentication and authorization
+  - Front End: Angular 8, Typescript, Angular material
+  - Back End: Nodejs, Express, MongoDB, Mongoose, JWT for authentication and authorization
 
 Here is the workflow -
  - Create User
