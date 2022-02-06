@@ -13,7 +13,7 @@ Here is the workflow -
  - View Posts
  - Edit Posts
 
-This code base alos follows the clean code structure and extensible to add new features. Please feel free to fork and use it for your learning needs.
+Also, this code base follows the clean code structure and extensible to add new features. Please feel free to fork and use it for your learning needs.
 
 ## Development server
 
