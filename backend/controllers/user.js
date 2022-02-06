@@ -4,6 +4,7 @@ const User = require("../models/user");
 const user = require("../models/user");
 
 exports.createUser = (req, res, next) => {
+  console.log(req.body.email);
   //hash the password
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
@@ -13,6 +14,7 @@ exports.createUser = (req, res, next) => {
       });
       user.save()
         .then(result => {
+          console.log('User successfully created!');
           res.status(201).json({
             message: 'User created!',
             result: result

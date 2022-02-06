@@ -17,6 +17,7 @@ export class AuthService {
   //private tokenTimer: NodeJS.Timer;
   private tokenTimer: any;
   private userId: string;
+  private loggedInUserEmail: string;
 
   constructor(private http: HttpClient, private router: Router) {
 
@@ -41,8 +42,8 @@ export class AuthService {
 
     this.http.post(BACKEND_URL + "/signup", authData)
       .subscribe(response => {
-        //console.log(response);
-        this.router.navigate["/"];
+        console.log(response);
+        this.router.navigate(["/"]);
       }, error => {
         //console.log(error)
         this.authStatusListener.next(false);
@@ -50,6 +51,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
+    this.loggedInUserEmail = email;
     const authData: AuthData = {
       email: email, password: password
     };
@@ -79,6 +81,10 @@ export class AuthService {
       }, error => {
         this.authStatusListener.next(false);
       });
+  }
+
+  getLoggedInUserEmail() {
+    return this.loggedInUserEmail;
   }
 
   getUserId() {

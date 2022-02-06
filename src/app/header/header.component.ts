@@ -10,9 +10,8 @@ import { AuthService } from '../auth/auth.service';
 export class HeaderComponent implements OnInit, OnDestroy {
   userIsAuthenticated = false;
   private authListenerSubs: Subscription;
-
+  loggedInUserEmail: string;
   constructor(private authService: AuthService) {
-
   }
 
   ngOnInit() {
@@ -20,6 +19,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.authListenerSubs = this.authService.getAuthStatusListener()
       .subscribe(isAuthenticated => {
         this.userIsAuthenticated = isAuthenticated;
+        this.loggedInUserEmail = this.authService.getLoggedInUserEmail();
       });
   }
 
@@ -31,5 +31,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // inform all parts of page
   onLogout(): void {
     this.authService.logout();
+  }
+
+  onShowUserInfo(): void {
+    // Do nothing for now
   }
 }
